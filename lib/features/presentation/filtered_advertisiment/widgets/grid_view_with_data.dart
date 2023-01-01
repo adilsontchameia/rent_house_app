@@ -137,7 +137,7 @@ class GridViewWithData extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            BounceInUp(
+                            BounceInDown(
                               child: Text(
                                 data['title'],
                                 softWrap: true,
