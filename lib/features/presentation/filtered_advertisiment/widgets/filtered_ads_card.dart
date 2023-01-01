@@ -1,3 +1,4 @@
+import '../../../services/advertisement_service.dart';
 import '../filtered_advertisiment.dart';
 
 class FilteredAdvertisimentCard extends StatefulWidget {
@@ -96,7 +97,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
             collapsedIconColor: Colors.brown,
             iconColor: Colors.brown,
             leading: const Icon(FontAwesomeIcons.filter, color: Colors.brown),
-            title: const Text('Por Categorias e Provincias',
+            title: const Text('Por Categorias',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0)),
             children: [
               Wrap(
@@ -161,28 +162,6 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                     isSelected: buttonSelectedStates[4],
                     index: 4,
                   ),
-                  DropdownButton<String>(
-                    dropdownColor: Colors.brown,
-                    value: provinceFilter,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        if (newValue == 'Todas Provincias') {
-                          provinceFilter =
-                              null; // Clear the provinceFilter when "Todas Provincias" is selected
-                        } else {
-                          provinceFilter =
-                              newValue; // Update the provinceFilter for other provinces
-                        }
-                      });
-                    },
-                    items: provincesAvailable
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  )
                 ],
               ),
             ]),
@@ -192,7 +171,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
             iconColor: Colors.brown,
             leading: const Icon(FontAwesomeIcons.filterCircleDollar,
                 color: Colors.brown),
-            title: const Text('Por Preço',
+            title: const Text('Por Preços',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0)),
             children: [
               RangeSlider(
@@ -219,37 +198,36 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 },
               ),
             ]),
-        StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('sales').snapshots(),
+        StreamBuilder<List<AdvertisementModel>>(
+          stream: advertisementManager.getAllSales(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressOnFecthing();
             } else if (snapshot.hasError) {
               return const ErrorIconOnFetching();
-            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               if (query.isEmpty) {
                 return const NoResultsFoundWidget();
               } else {
                 return const NoResultsFoundWidget();
               }
             } else {
-              List<DocumentSnapshot> filteredDocs =
-                  snapshot.data!.docs.where((doc) {
-                var data = doc.data() as Map<String, dynamic>;
-                bool titleMatches = data['title']
+              List<AdvertisementModel> filteredAds =
+                  snapshot.data!.where((ads) {
+                bool titleMatches = ads.title!
                     .toString()
                     .toLowerCase()
                     .contains(query.toLowerCase());
 
-                bool priceAddress = data['address']
+                bool priceAddress = ads.address!
                     .toString()
                     .toLowerCase()
                     .contains(query.toLowerCase());
-                bool category = data['type']
+                bool category = ads.type!
                     .toString()
                     .toLowerCase()
                     .contains(query.toLowerCase());
-                bool province = data['province']
+                bool province = ads.province!
                     .toString()
                     .toLowerCase()
                     .contains(query.toLowerCase());
@@ -260,12 +238,12 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                     category ||
                     province) {
                   if (topPickedFilter != null &&
-                      data['isPromo'] != topPickedFilter) {
+                      ads.isPromo != topPickedFilter) {
                     return false;
                   }
 
                   if (categoryFilter != null &&
-                      !data['type']
+                      !ads.type
                           .toString()
                           .toLowerCase()
                           .contains(categoryFilter!)) {
@@ -273,7 +251,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                   }
 
                   if (provinceFilter != null &&
-                      !data['province']
+                      !ads.province
                           .toString()
                           .toLowerCase()
                           .contains(provinceFilter!)) {
@@ -281,12 +259,12 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                   }
 
                   if (minPriceFilter != null &&
-                      (data['monthlyPrice'] as int) < minPriceFilter!) {
+                      (ads.monthlyPrice as double) < minPriceFilter!) {
                     return false;
                   }
 
                   if (maxPriceFilter != null &&
-                      (data['monthlyPrice'] as int) > maxPriceFilter!) {
+                      (ads.monthlyPrice as double) > maxPriceFilter!) {
                     return false;
                   }
 
@@ -296,7 +274,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 return false;
               }).toList();
 
-              if (filteredDocs.isEmpty) {
+              if (filteredAds.isEmpty) {
                 return const NoResultsFoundWidget();
               }
 
@@ -304,7 +282,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Anúncios Listados: ${filteredDocs.length}',
+                    'Anúncios Listados: ${filteredAds.length}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
@@ -319,13 +297,10 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 10,
-                      itemCount: filteredDocs.length,
+                      itemCount: filteredAds.length,
                       itemBuilder: (context, index) {
-                        var data =
-                            filteredDocs[index].data() as Map<String, dynamic>;
-                        AdvertisementModel advertisement =
-                            AdvertisementModel.fromSnapshot(
-                                filteredDocs[index]);
+                        var data = filteredAds[index].toJson();
+                        AdvertisementModel advertisement = filteredAds[index];
                         return GestureDetector(
                           onTap: () => Navigator.of(context).pushNamed(
                             SaleDetailsScreen.routeName,
@@ -360,14 +335,16 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          data['title'],
-                                          softWrap: true,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.0,
+                                        BounceInDown(
+                                          child: Text(
+                                            data['title'],
+                                            softWrap: true,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
                                           ),
                                         ),
                                         TopPickedCardContent(
