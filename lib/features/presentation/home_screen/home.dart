@@ -1,7 +1,6 @@
 export 'package:rent_house_app/config/router/routes.dart';
 export 'package:rent_house_app/features/presentation/home_screen/widgets/latest_sales_card.dart';
 export 'package:rent_house_app/features/presentation/home_screen/widgets/promotion_slider.dart';
-export 'package:rent_house_app/features/services/advertisement_service.dart';
 
 export 'package:animate_do/animate_do.dart';
 export 'package:flutter/material.dart';
