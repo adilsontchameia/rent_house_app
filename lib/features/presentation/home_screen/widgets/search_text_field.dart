@@ -9,6 +9,7 @@ class SearchField extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextEditingController controller;
   final IconData icon;
+  final bool isVisible;
   const SearchField({
     Key? key,
     this.label = '',
@@ -19,6 +20,7 @@ class SearchField extends StatefulWidget {
     this.validator,
     required this.controller,
     required this.icon,
+    required this.isVisible,
   }) : super(key: key);
 
   @override
@@ -26,13 +28,6 @@ class SearchField extends StatefulWidget {
 }
 
 class _SearchFieldState extends State<SearchField> {
-  bool? isVisible;
-  @override
-  void initState() {
-    isVisible = false;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -50,7 +45,7 @@ class _SearchFieldState extends State<SearchField> {
               color: const Color.fromARGB(255, 55, 55, 55)),
           decoration: InputDecoration(
             suffixIcon: Visibility(
-              visible: true,
+              visible: widget.isVisible,
               child: IconButton(
                 onPressed: () {
                   setState(() {
