@@ -65,11 +65,12 @@ class VerifiedSellerName extends StatelessWidget {
                 ),
                 FadeInLeft(
                   child: Text(
-                    publishedDate,
+                    publishedDate.toString(),
                     style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12.0,
-                        color: Colors.white),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
