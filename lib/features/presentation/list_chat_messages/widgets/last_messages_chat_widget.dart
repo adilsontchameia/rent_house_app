@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:rent_house_app/features/data/models/chat_contact.dart';
 import 'package:rent_house_app/features/presentation/chat_messages/chat_messages_screen.dart';
 
 import '../../../services/auth_service.dart';
@@ -7,6 +9,7 @@ import '../../home_screen/home.dart';
 
 class LastMessagesChatWidget extends StatelessWidget {
   LastMessagesChatWidget({super.key});
+
   final ChatService _chatService = ChatService();
   final AuthService _authService = AuthService();
 
@@ -30,27 +33,37 @@ class LastMessagesChatWidget extends StatelessWidget {
               itemCount: filteredUIDs.length,
               itemBuilder: (context, index) {
                 final uid = filteredUIDs[index];
-                return GestureDetector(
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    ChatMessagesScreen.routeName,
-                    arguments: {
-                      'name': 'Name', //TODO store userName on model either
-                      'uid': uid,
-                    },
-                  ),
-                  child: FutureBuilder<Map<String, dynamic>>(
-                    future: _chatService.getLastMessage(uid),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
 
-                      final lastMessage = snapshot.data!;
+                // Create a ValueNotifier for each chat contact
+                final ValueNotifier<ChatContact> chatContactNotifier =
+                    ValueNotifier<ChatContact>(ChatContact());
 
-                      return Padding(
+                // Fetch the chat contact and update the notifier
+                _chatService.getLastMessage(uid).then((chatContact) {
+                  chatContactNotifier.value = chatContact;
+                });
+
+                return ValueListenableBuilder<ChatContact>(
+                  valueListenable: chatContactNotifier,
+                  builder: (context, chatContact, child) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container();
+                    }
+                    final now = DateTime.now();
+
+                    String formattedDate =
+                        DateFormat.jm().format(chatContact.timeSent ?? now);
+
+                    return GestureDetector(
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        ChatMessagesScreen.routeName,
+                        arguments: {
+                          'name': chatContact.name,
+                          'uid': uid,
+                        },
+                      ),
+                      child: Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -58,14 +71,12 @@ class LastMessagesChatWidget extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(80.0),
                               child: CachedNetworkImage(
-                                //TODO store seller imageUrl
-                                imageUrl:
-                                    'https://firebasestorage.googleapis.com/v0/b/homerent-a6208.appspot.com/o/profilePics%2F2023-08-02%2016%3A29%3A40.016667?alt=media&token=abb87b01-47c9-4762-812f-e8bb7be31be8',
+                                imageUrl: chatContact.profilePic ?? '',
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressOnFecthing(),
                                 ),
                                 errorWidget: (context, url, error) =>
-                                    const ErrorIconOnFetching(),
+                                    const CircularProgressOnFecthing(),
                                 fit: BoxFit.fill,
                                 height: 50.0,
                                 width: 50.0,
@@ -77,7 +88,7 @@ class LastMessagesChatWidget extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    uid,
+                                    chatContact.name ?? 'Carregado...',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.brown,
@@ -88,7 +99,7 @@ class LastMessagesChatWidget extends StatelessWidget {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        lastMessage['lastMessage'],
+                                        chatContact.lastMessage ?? '',
                                         style: const TextStyle(
                                           overflow: TextOverflow.ellipsis,
                                           fontWeight: FontWeight.w400,
@@ -96,8 +107,7 @@ class LastMessagesChatWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        lastMessage['lastMessageDate']
-                                            .toString(),
+                                        formattedDate,
                                         style: const TextStyle(
                                           overflow: TextOverflow.ellipsis,
                                           fontWeight: FontWeight.w500,
@@ -111,9 +121,9 @@ class LastMessagesChatWidget extends StatelessWidget {
                             )
                           ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
