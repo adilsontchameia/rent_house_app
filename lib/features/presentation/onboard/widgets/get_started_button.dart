@@ -1,6 +1,4 @@
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
+import '../../../../app/app.dart';
 
 class GetStartedButton extends StatelessWidget {
   const GetStartedButton({
@@ -16,17 +14,24 @@ class GetStartedButton extends StatelessWidget {
         child: SizedBox(
           height: 50.0,
           child: ElevatedButton(
-            onPressed: () {
-              log('Navigated');
-            },
+            onPressed: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) =>
+                    const BottomNavigationScreens(),
+              ),
+            ),
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0))),
+              backgroundColor: Colors.brown,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+            ),
             child: const Text(
               'Iniciar',
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
+                fontSize: 18.0,
               ),
             ),
           ),
