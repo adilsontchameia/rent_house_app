@@ -12,8 +12,10 @@ class OnboardTextContent extends StatelessWidget {
     return Text(
       title,
       textAlign: TextAlign.center,
-      style: const TextStyle(
-          fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
+      style: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+          color: Colors.brown.shade100),
     );
   }
 }
@@ -31,7 +33,7 @@ class OnboardTitles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 100.0,
+        height: 120.0,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0),
           child: PageView(
