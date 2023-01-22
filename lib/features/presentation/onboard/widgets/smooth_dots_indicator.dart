@@ -16,8 +16,8 @@ class SmoothDotsIndicator extends StatelessWidget {
     return SmoothPageIndicator(
       controller: _controller,
       count: titlesList.length,
-      effect: const JumpingDotEffect(
-        activeDotColor: Colors.white,
+      effect: JumpingDotEffect(
+        activeDotColor: Colors.brown.shade200,
         dotColor: Colors.grey,
         dotHeight: 10.0,
         dotWidth: 10.0,
