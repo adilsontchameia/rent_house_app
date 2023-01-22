@@ -6,6 +6,7 @@ import 'package:rent_house_app/features/presentation/register/widgets/location_t
 import 'package:rent_house_app/features/presentation/widgets/custom_input_text.dart';
 import 'package:rent_house_app/core/validator_mixin.dart';
 import 'package:rent_house_app/features/presentation/widgets/error_icon_on_fetching.dart';
+import 'package:rent_house_app/features/services/auth_service.dart';
 import 'package:rent_house_app/features/services/user_manager.dart';
 
 class ProfileScreen extends StatelessWidget with ValidationMixins {
@@ -25,6 +26,8 @@ class ProfileScreen extends StatelessWidget with ValidationMixins {
   final TextEditingController currentLocationController =
       TextEditingController();
   final UserManager _userManager = UserManager();
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +53,9 @@ class ProfileScreen extends StatelessWidget with ValidationMixins {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () async {
+                      await _authService.signOut();
+                    },
                     child: Container(
                       height: 35.0,
                       width: 35.0,
@@ -71,8 +76,8 @@ class ProfileScreen extends StatelessWidget with ValidationMixins {
                   ),
                 ],
               ),
-              FutureBuilder<UserModel>(
-                future: _userManager.getById(_userManager.getUser().uid),
+              StreamBuilder<UserModel>(
+                stream: _userManager.getUserById(_userManager.getUser().uid),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     // Show loading indicator while waiting for the data
