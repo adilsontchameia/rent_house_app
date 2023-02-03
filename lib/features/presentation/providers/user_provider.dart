@@ -1,26 +1,27 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rent_house_app/features/presentation/home/home.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:rent_house_app/core/factories/dialogs.dart';
 import 'package:rent_house_app/features/services/auth_service.dart';
 import 'package:rent_house_app/features/services/user_manager.dart';
 import 'dart:developer';
-import 'dart:io';
+import 'package:geocoding/geocoding.dart';
 
 import 'package:geolocator/geolocator.dart';
 
 import 'package:permission_handler/permission_handler.dart' as permission;
-import 'package:location_geocoder/location_geocoder.dart';
-import 'package:rent_house_app/helpers/factories/dialogs.dart';
+
+import '../bottom_navigation_pages/bottom_navigation_screen.dart';
 
 class UserAuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final UserManager _userManager = UserManager();
-  final String kAPiKey = 'AIzaSyAFNp_Brt4Bdmek4Jr1iau7RYYIbIL5h6g';
+
+  final ShowAndHideDialogs _dialogs = ShowAndHideDialogs();
   Position? position;
   StreamSubscription? _gpsStatusSubscription;
   //ErrorMessage
@@ -38,14 +39,13 @@ class UserAuthProvider extends ChangeNotifier {
   //Image Utils
   XFile? fileImage;
   bool isReady = false;
-  final ShowAndHideDialogs _dialogs = ShowAndHideDialogs();
 
   void init() async {
     final status = await permission.Permission.locationWhenInUse.request();
     if (status == permission.PermissionStatus.granted) {
       await getCurrentLocation();
     }
-    _verifyGpsStatus();
+    _requestGpsPermission();
   }
 
   @override
@@ -54,177 +54,128 @@ class UserAuthProvider extends ChangeNotifier {
     _gpsStatusSubscription?.cancel();
   }
 
-  Future<void> _verifyGpsStatus() async {
-    try {
-      gpsEnabled = await Geolocator.isLocationServiceEnabled();
-      _gpsStatusSubscription =
-          Geolocator.getServiceStatusStream().listen((status) {
-        gpsEnabled = status == ServiceStatus.enabled;
-        notifyListeners();
-      });
-      final status = await permission.Permission.locationWhenInUse.request();
-
-      switch (status) {
-        case permission.PermissionStatus.denied:
-          if (Platform.isIOS || Platform.isAndroid) {
-            permission.openAppSettings();
-          }
-          //if (Platform.isAndroid) showToastMessage('Permission Danied');
-          break;
-        case permission.PermissionStatus.granted:
-          debugPrint('Has Permission');
-          break;
-        case permission.PermissionStatus.restricted:
-          debugPrint('Permission Restricted');
-          break;
-        case permission.PermissionStatus.limited:
-          debugPrint('Permission Limited');
-          break;
-        case permission.PermissionStatus.provisional:
-          debugPrint('Provisional Limited');
-          break;
-        case permission.PermissionStatus.permanentlyDenied:
-          permission.openAppSettings();
-          break;
-      }
-    } on Geolocator catch (e) {
-      log(e.toString());
+  Future<void> _requestGpsPermission() async {
+    final status = await Permission.locationWhenInUse.request();
+    debugPrint('Status: $status');
+    switch (status) {
+      case PermissionStatus.denied:
+        _openAppSettings();
+        break;
+      case PermissionStatus.granted:
+        log('Permission Granted');
+        break;
+      case PermissionStatus.restricted:
+        log('Permission Restricted');
+        break;
+      case PermissionStatus.limited:
+        log('Permission Limited');
+        break;
+      case PermissionStatus.provisional:
+        log('Permission Provisional');
+        break;
+      case PermissionStatus.permanentlyDenied:
+        _openAppSettings();
+        break;
     }
+  }
+
+  _openAppSettings() async {
+    await openAppSettings();
   }
 
   Future<void> getCurrentLocation() async {
     try {
+      await _requestGpsPermission();
       position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      userAddressLatitude = position!.latitude;
-      userAddressLongitude = position!.longitude;
-      final coordinates = Coordinates(
-        userAddressLatitude,
-        userAddressLongitude,
-      );
-      final LocatitonGeocoder geocoder = LocatitonGeocoder(kAPiKey);
-      final address = await geocoder.findAddressesFromCoordinates(coordinates);
-      featureName = address.first.featureName!;
-      addressLine = address.first.addressLine!;
-      userAddress = '$featureName\n$addressLine';
-      log(userAddress);
-      log(userAddressLatitude.toString());
-      log(userAddressLongitude.toString());
-      notifyListeners();
-      permissionAllowed = true;
+      if (position != null) {
+        userAddressLatitude = position!.latitude;
+        userAddressLongitude = position!.longitude;
+        final List<Placemark> placemarks = await placemarkFromCoordinates(
+          userAddressLatitude!,
+          userAddressLongitude!,
+        );
+        if (placemarks.isNotEmpty) {
+          final Placemark placemark = placemarks.first;
+          featureName = placemark.name ?? '';
+          addressLine = placemark.street ?? '';
+          userAddress = '$featureName, $addressLine';
+        }
+      } else {
+        log('Error: Unable to get current location. Position is null.');
+      }
     } catch (e) {
-      //_dialogs.showToastMessage('Não foi possivel determinar sua localização, por favor, tente novamente.');
-      log('Location Exeption: $e');
+      log('Error: $e');
     }
   }
 
 //Register User Using Email
   Future<void> signUp({
-    String? name,
+    String? firstName,
+    String? surnName,
     String? email,
     String? phone,
+    String? password,
     String? address,
     var latitude,
     var longitude,
-    String? password,
     XFile? image,
   }) async {
     try {
-      _dialogs.showProgressIndicator();
-      position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
       if (isReady) {
+        if (image == null) {
+          throw Exception("Image is null");
+        }
         //GetImage URL to store to DB
+
+        _dialogs.showProgressIndicator();
         await _userManager
-            .uploadPicture(image!.path, DateTime.now().toString())
+            .uploadPicture(image.path, DateTime.now().toString())
             .then((url) async {
+          log('Email Provider:${email!}');
           await _authService.register(
-            name: name,
+            firstName: firstName,
+            surnName: surnName,
             email: email,
+            password: password,
             phone: phone,
             address: address,
-            latitude: position!.latitude,
-            longitude: position!.longitude,
-            location: GeoPoint(position!.latitude, position!.longitude),
-            password: password,
+            latitude: userAddressLatitude,
+            longitude: userAddressLongitude,
             image: url,
           );
-
           await _userManager.create(_authService.user);
-          _dialogs.disposeProgressIndicator();
-          Get.off(() => const HomeScreen());
 
+          _dialogs.disposeProgressIndicator();
+          Get.off(() => const BottomNavigationScreens());
           return url;
         });
       } else {
+        _dialogs.disposeProgressIndicator();
         log('Nulo');
-      }
-    } on FirebaseAuthException catch (e) {
-      _dialogs.disposeProgressIndicator();
-      if (e.code == 'email-already-in-use') {
-        _dialogs.showToastMessage(
-            'E-mail in Use: This e-mail is already in use, if it might be a error, please contact the Support Team.');
-      } else if (e.code == 'invalid-email') {
-        _dialogs.showToastMessage(
-            'Invalid E-mail: You entered an invalid e-mail address.');
-      } else if (e.code == 'operation-not-allowed') {
-        _dialogs.showToastMessage(
-            'email/password accounts are not enabled. Enable email/password accounts in the Firebase Console, under the Auth tab');
-      } else if (e.code == 'weak-password') {
-        _dialogs.showToastMessage(
-            'Weak Password: The password is not strong enough.');
-      } else if (e.code == 'network-request-failed') {
-        _dialogs.showToastMessage(
-            'Internet Connection: Please, check your internet connection before proceed.');
-      } else {
-        _dialogs.showToastMessage('Unkown Error: $e.');
       }
     } catch (e) {
       _dialogs.disposeProgressIndicator();
-      log('Register: $e');
+      _dialogs.showToastMessage(e.toString());
     }
     notifyListeners();
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     try {
-      _dialogs.showProgressIndicator();
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      )
-          .then((_) {
-        _dialogs.disposeProgressIndicator();
-        Get.off(() => const HomeScreen());
-      });
+      await _authService.login(
+        context,
+        email,
+        password,
+      );
     } on FirebaseAuthException catch (e) {
-      _dialogs.disposeProgressIndicator();
-      if (e.code == 'user-not-found') {
-        _dialogs.showToastMessage('User not Found: Please check your email.');
-      } else if (e.code == 'wrong-password') {
-        _dialogs.showToastMessage(
-            'Wrong Password: Please check it before proceed.');
-      } else if (e.code == 'invalid-email') {
-        _dialogs.showToastMessage(
-            'Invalid E-mail: Please check your email, it might be wrong.');
-      } else if (e.code == 'user-disabled') {
-        _dialogs.showToastMessage(
-            'User Disabled: This account has been disabled by the ADMIN, please contact the Support Team.');
-      } else if (e.code == 'too-many-requests') {
-        _dialogs.showToastMessage(
-            'Too Many Requests: Please take a break and hold on some minutes.');
-      } else if (e.code == 'network-request-failed') {
-        _dialogs.showToastMessage(
-            'Internet Connection: Please, check your internet connection before proceed.');
-      } else {
-        _dialogs.showToastMessage(
-            'Unknown Error: Unknown error, please contact the Support Team.');
-      }
+      log(e.toString());
     }
-    notifyListeners();
   }
 
   Future<void> resetPassword(String email) async {
