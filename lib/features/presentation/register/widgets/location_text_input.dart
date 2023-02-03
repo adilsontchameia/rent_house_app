@@ -44,7 +44,7 @@ class _LocationInputTextState extends State<LocationInputText> {
           keyboardType: widget.keyboardType,
           onChanged: widget.onChanged,
           validator: widget.validator,
-          cursorColor: Colors.black,
+          cursorColor: Colors.brown,
           style: TextStyle(
               fontSize: widget.fontSize,
               color: const Color.fromARGB(255, 55, 55, 55)),
@@ -53,7 +53,7 @@ class _LocationInputTextState extends State<LocationInputText> {
               padding: const EdgeInsets.only(right: 5.0),
               child: Container(
                 decoration: const BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.brown,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(8.0),
                       bottomLeft: Radius.circular(8.0),
@@ -63,53 +63,51 @@ class _LocationInputTextState extends State<LocationInputText> {
               ),
             ),
             suffixIcon: InkWell(
-                onTap: () {
+                onTap: () async {
                   widget.controller.text = 'Procurando, Por Favor, Aguarde.';
-                  geolocatorProvider.getCurrentLocation().then((_) {
-                    try {
-                      return widget.controller.text =
-                          geolocatorProvider.userAddress;
-                    } catch (e) {
-                      return ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(
-                        duration: Duration(seconds: 4),
-                        content: Text(
-                          'Não foi possivel determinar sua localização, por favor, tente novamente.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12.0,
-                          ),
+                  try {
+                    await geolocatorProvider.getCurrentLocation();
+                    widget.controller.text = geolocatorProvider.userAddress;
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      duration: Duration(seconds: 4),
+                      content: Text(
+                        'Não foi possível determinar sua localização, por favor, tente novamente.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12.0,
                         ),
-                        backgroundColor: Colors.black,
-                      ));
-                    }
-                  });
-                  widget.controller.text = 'Procurando';
+                      ),
+                      backgroundColor: Colors.brown,
+                    ));
+                    widget.controller.text =
+                        ''; // Reset the text field if location retrieval fails.
+                  }
                 },
                 child: const Icon(
                   Icons.location_pin,
-                  color: Colors.black,
+                  color: Colors.brown,
                 )),
-            prefixIconColor: Colors.black,
+            prefixIconColor: Colors.brown,
             filled: true,
             fillColor: Colors.white,
             hintText: widget.label,
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             border: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.black,
+                color: Colors.brown,
               ),
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.black,
+                color: Colors.brown,
               ),
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             labelStyle: const TextStyle(
-              color: Colors.black45,
+              color: Colors.brown,
               fontWeight: FontWeight.w500,
               fontSize: 15.0,
             ),
