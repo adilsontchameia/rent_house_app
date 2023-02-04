@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:rent_house_app/core/utils.dart';
 import 'package:rent_house_app/features/presentation/sale_detail/sale_details.dart';
 import 'package:rent_house_app/features/presentation/widgets/error_icon_on_fetching.dart';
 
@@ -108,6 +111,9 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                 itemCount: widget.advertisement.image!.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
+                  log('debugApp Seller ID: ${widget.advertisement.sellerId!}');
+                  log('debugApp Ads ID: ${widget.advertisement.id!}');
+
                   final bool isSelected = selectedImageIndex == index;
                   return Align(
                     alignment: Alignment.bottomCenter,
@@ -177,7 +183,7 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                   ),
                   FadeInLeft(
                     child: Text(
-                      'Data: ${widget.advertisement.publishedDate}',
+                      'Data: ${formatDateTime(widget.advertisement.publishedDate!)}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 12.0,
