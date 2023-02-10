@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+import 'widgets.dart';
 
-class InputText extends StatefulWidget {
+class CustomInputText extends StatefulWidget {
   final String label;
   final TextInputType keyboardType;
   final bool borderEnabled;
@@ -10,7 +10,7 @@ class InputText extends StatefulWidget {
   final TextEditingController controller;
   final IconData icon;
   final bool isPassword;
-  const InputText({
+  const CustomInputText({
     Key? key,
     this.label = '',
     this.keyboardType = TextInputType.text,
@@ -24,10 +24,10 @@ class InputText extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<InputText> createState() => _InputTextState();
+  State<CustomInputText> createState() => _CustomInputTextState();
 }
 
-class _InputTextState extends State<InputText> {
+class _CustomInputTextState extends State<CustomInputText> {
   bool? isVisible;
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _InputTextState extends State<InputText> {
           obscureText: widget.isPassword ? !isVisible! : false,
           onChanged: widget.onChanged,
           validator: widget.validator,
-          cursorColor: Colors.black,
+          cursorColor: Colors.brown,
           style: TextStyle(
               fontSize: widget.fontSize,
               color: const Color.fromARGB(255, 55, 55, 55)),
@@ -56,7 +56,7 @@ class _InputTextState extends State<InputText> {
               padding: const EdgeInsets.only(right: 5.0),
               child: Container(
                 decoration: const BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.brown,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(8.0),
                       bottomLeft: Radius.circular(8.0),
@@ -76,32 +76,32 @@ class _InputTextState extends State<InputText> {
                   child: !isVisible!
                       ? const Icon(
                           Icons.visibility,
-                          color: Colors.black,
+                          color: Colors.brown,
                         )
                       : const Icon(
                           Icons.visibility_off,
-                          color: Colors.black,
+                          color: Colors.brown,
                         )),
             ),
-            prefixIconColor: Colors.black,
+            prefixIconColor: Colors.brown,
             filled: true,
             fillColor: Colors.white,
             hintText: widget.label,
             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             border: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.black,
+                color: Colors.brown,
               ),
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.black,
+                color: Colors.brown,
               ),
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
-            labelStyle: const TextStyle(
-              color: Colors.black45,
+            labelStyle: TextStyle(
+              color: Colors.brown.shade300,
               fontWeight: FontWeight.w500,
               fontSize: 15.0,
             ),
