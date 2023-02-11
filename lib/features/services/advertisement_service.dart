@@ -2,90 +2,21 @@ import 'services.dart';
 
 class HomeAdvertisementManager {
   //? Firebase
-  final CollectionReference _ref =
-      FirebaseFirestore.instance.collection('sales');
+  final CollectionReference _ref = FirebaseFirestore.instance.collection('ads');
 
   //? Get all sales
   Stream<List<AdvertisementModel>> getAllSales() {
     return _ref.snapshots().map((querySnapshot) {
       List<AdvertisementModel> sales = [];
+
       for (var document in querySnapshot.docs) {
+        print("Document data: ${document.data()}");
+
         AdvertisementModel sale = AdvertisementModel.fromJson(
             document.data() as Map<String, dynamic>);
         sales.add(sale);
       }
-      return sales;
-    });
-  }
 
-  Stream<List<AdvertisementModel>> searchAdvertisements(String query) {
-    return _ref
-        .where('title', isGreaterThanOrEqualTo: query)
-        .snapshots()
-        .map((querySnapshot) {
-      List<AdvertisementModel> sales = [];
-      for (var document in querySnapshot.docs) {
-        AdvertisementModel sale = AdvertisementModel.fromJson(
-            document.data() as Map<String, dynamic>);
-        sales.add(sale);
-      }
-      return sales;
-    });
-  }
-
-  //? Get all top picked sales
-  Stream<List<AdvertisementModel>> getTopPickedSales() {
-    return _ref
-        .where(
-          'topPicked',
-          isEqualTo: true,
-        )
-        .snapshots()
-        .map((querySnapshot) {
-      List<AdvertisementModel> sales = [];
-      for (var document in querySnapshot.docs) {
-        AdvertisementModel sale = AdvertisementModel.fromJson(
-            document.data() as Map<String, dynamic>);
-        sales.add(sale);
-      }
-      return sales;
-    });
-  }
-
-  Stream<List<AdvertisementModel>> getFilteredSales({
-    bool? topPicked,
-    String? category,
-    int? minPrice,
-    int? maxPrice,
-  }) {
-    // Start with the reference to the collection
-    Query query = _ref;
-
-    // Apply filters based on the provided parameters
-    if (topPicked != null) {
-      query = query.where('topPicked', isEqualTo: topPicked);
-    }
-
-    if (category != null) {
-      query = query.where('category', isEqualTo: category);
-    }
-
-    if (minPrice != null) {
-      query = query.where('price', isGreaterThanOrEqualTo: minPrice);
-    }
-
-    if (maxPrice != null) {
-      query = query.where('price', isLessThanOrEqualTo: maxPrice);
-    }
-
-    //? Get the snapshots and map the results
-    return query.snapshots().map((querySnapshot) {
-      List<AdvertisementModel> sales = [];
-      for (var document in querySnapshot.docs) {
-        AdvertisementModel sale = AdvertisementModel.fromJson(
-            document.data() as Map<String, dynamic>);
-        sales.add(sale);
-      }
       return sales;
     });
   }
