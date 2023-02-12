@@ -38,7 +38,7 @@ class AuthService {
           await FirebaseAuth.instance.signInWithCredential(credential);
       if (userCredential.user != null) {
         log(userCredential.user!.displayName!);
-        Get.off(() => HomeResumeScreen());
+        Get.off(() => const HomeResumeScreen());
 
         log(userCredential.user!.displayName!);
       } else {
@@ -92,10 +92,10 @@ class AuthService {
 
   //? Register With Email and Password
   Future<UserModel> register({
-    String? name,
+    String? firstName,
     String? surnName,
-    String? email,
     String? phone,
+    String? email,
     String? address,
     String? password,
     double? latitude,
@@ -103,21 +103,25 @@ class AuthService {
     String? image,
   }) async {
     try {
+      log('Email Service:${email!}');
       await _firebaseAuth
           .createUserWithEmailAndPassword(
-        email: email!,
+        email: email,
         password: password!,
       )
           .then((_) async {
         user = UserModel(
           id: getUser().uid,
-          firstName: name,
+          firstName: firstName,
           surnName: surnName,
+          fullName: '$firstName $surnName',
           phone: phone,
           email: email,
           address: address,
           latitude: latitude,
           longitude: longitude,
+          isTyping: false,
+          isOnline: true,
           image: image,
         );
       });
