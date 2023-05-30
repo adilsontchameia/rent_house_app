@@ -1,9 +1,10 @@
+import '../data/models/seller_model.dart';
 import 'services.dart';
 
 class SellerServiceManager {
   //? Firebase
   final CollectionReference _ref =
-      FirebaseFirestore.instance.collection('seller');
+      FirebaseFirestore.instance.collection('sellers');
 
   //? Get all sallers
   Stream<List<SellerModel>> getAllSellers() {
