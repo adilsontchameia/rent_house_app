@@ -9,7 +9,6 @@ export 'package:google_sign_in/google_sign_in.dart';
 export 'package:rent_house_app/features/presentation/bottom_navigation_pages/bottom_navigation_screen.dart';
 export 'package:rent_house_app/features/presentation/login/login_screen.dart';
 export 'package:geoflutterfire2/geoflutterfire2.dart';
-export 'package:rent_house_app/features/data/models/seller_model.dart';
 
 export 'dart:io';
 
