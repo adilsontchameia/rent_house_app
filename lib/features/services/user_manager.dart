@@ -1,12 +1,15 @@
 import '../../app/app.dart';
+import '../data/models/seller_model.dart';
 import 'services.dart';
 
 class UserManager extends ChangeNotifier {
   //? Firebase
   final CollectionReference _ref =
       FirebaseFirestore.instance.collection('users');
+  final CollectionReference _clientsRef =
+      FirebaseFirestore.instance.collection('clients');
   final CollectionReference _sellerRef =
-      FirebaseFirestore.instance.collection('seller');
+      FirebaseFirestore.instance.collection('sellers');
   final FirebaseStorage _storage = FirebaseStorage.instance;
   late final FirebaseAuth _firebaseAuth;
 
@@ -14,10 +17,23 @@ class UserManager extends ChangeNotifier {
     _firebaseAuth = FirebaseAuth.instance;
   }
 
+  void isWriting() {
+    _clientsRef.doc(getUser().uid).update({'isTyping': true});
+  }
+
+  void isNotWriting() {
+    _clientsRef.doc(getUser().uid).update({'isTyping': false});
+  }
+
+  void setUserState(bool isOnline) {
+    _clientsRef.doc(getUser().uid).update({'isOnline': isOnline});
+  }
+
   //? Create User - Create User Info On Firebase Firestore
   Future<void> create(UserModel user) async {
     try {
-      return await _ref.doc(user.id).set(user.toJson());
+      await _ref.doc(user.id).set(user.toJson());
+      await _clientsRef.doc(user.id).set(user.toJson());
     } on FirebaseException catch (e) {
       log('Create Error: ${e.toString()}');
     }
