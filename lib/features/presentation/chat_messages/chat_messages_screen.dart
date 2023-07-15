@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rent_house_app/features/presentation/chat_messages/widgets/bottom_chat_field.dart';
 import 'package:rent_house_app/features/presentation/chat_messages/widgets/chat_list.dart';
+import 'package:rent_house_app/features/presentation/providers/user_data_provider.dart';
 import 'package:rent_house_app/features/services/user_manager.dart';
 
-import '../../services/auth_service.dart';
 import '../home_screen/home.dart';
 
 class ChatMessagesScreen extends StatefulWidget {
@@ -21,7 +21,19 @@ class ChatMessagesScreen extends StatefulWidget {
 
 class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
   final UserManager _userManager = UserManager();
-  final AuthService _authService = AuthService();
+  UserDataProvider userDataProvider = UserDataProvider();
+
+  Future<void> fetchCurrentUser() async {
+    await userDataProvider.getCurrentUserData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchCurrentUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -84,7 +96,7 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
                                 : 'Offline';
 
                             return Text(
-                              isTyping ? 'Typing...' : status,
+                              isTyping ? 'Escrevendo...' : status,
                               style: TextStyle(
                                 color: isTyping ? Colors.green : Colors.black38,
                                 fontWeight: FontWeight.bold,
@@ -108,7 +120,10 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
           Expanded(
             child: ChatList(sellerId: widget.uid),
           ),
-          BottomChatField(receiverId: widget.uid),
+          BottomChatField(
+            receiverId: widget.uid,
+            currentUserData: userDataProvider.currentUser,
+          ),
         ],
       ),
     );
