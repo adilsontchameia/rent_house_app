@@ -1,3 +1,5 @@
+import 'package:rent_house_app/features/services/user_manager.dart';
+
 import 'widgets/bottom_nav.dart';
 
 class BottomNavigationScreens extends StatefulWidget {
@@ -17,16 +19,48 @@ final tabIcons = [
 ];
 
 final appPages = [
-  HomeResumeScreen(),
+  const HomeResumeScreen(),
   const FilteredAdvertisimentScreen(),
-  const ChatMessageScreen(),
+  const ListChatMessagesScreen(),
   ProfileScreen(),
 ];
 
-class _BottomNavigationScreensState extends State<BottomNavigationScreens> {
+class _BottomNavigationScreensState extends State<BottomNavigationScreens>
+    with WidgetsBindingObserver {
   int currentIndex = 0;
   bool isVisible = true;
   final pageController = PageController(initialPage: 0);
+  final UserManager _userManager = UserManager();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      super.didChangeAppLifecycleState(state);
+      switch (state) {
+        case AppLifecycleState.resumed:
+          _userManager.setUserState(true);
+          break;
+        case AppLifecycleState.inactive:
+        case AppLifecycleState.detached:
+        case AppLifecycleState.paused:
+          _userManager.setUserState(false);
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,4 +164,3 @@ class _BottomNavigationScreensState extends State<BottomNavigationScreens> {
     );
   }
 }
-//eyeSlash
