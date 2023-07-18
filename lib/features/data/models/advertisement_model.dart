@@ -18,19 +18,19 @@ class AdvertisementModel {
   int? bedRooms;
   int? kitchen;
   int? livingRoom;
-  String? electricity;
-  String? yard;
-  String? water;
+  bool? electricity;
+  bool? yard;
+  bool? water;
   String? type;
   String? contact;
-  String? publishedDate;
+  DateTime? publishedDate;
   double? monthlyPrice;
   String? sellerName;
   String? province;
   double? latitude;
   double? longitude;
   bool? isPromo;
-  List<dynamic>? image;
+  List<String>? image;
 
   AdvertisementModel({
     this.id,
@@ -59,28 +59,29 @@ class AdvertisementModel {
 
   factory AdvertisementModel.fromJson(Map<String, dynamic> json) =>
       AdvertisementModel(
-        id: json["id"],
-        title: json["title"],
-        sellerId: json["sellerId"],
-        address: json["address"],
-        additionalDescription: json["additionalDescription"],
-        bathRoom: json["bathRoom"],
-        bedRooms: json["bedRooms"],
-        kitchen: json["kitchen"],
-        livingRoom: json["livingRoom"],
-        electricity: json["electricity"],
-        yard: json["yard"],
-        water: json["water"],
-        type: json["type"],
-        contact: json["contact"],
-        publishedDate: json["publishedDate"],
+        id: json["id"] ?? '',
+        title: json["title"] ?? '',
+        sellerId: json["sellerId"] ?? '',
+        address: json["address"] ?? '',
+        additionalDescription: json["additionalDescription"] ?? '',
+        bathRoom: json["bathRoom"] ?? 0,
+        bedRooms: json["bedRooms"] ?? 0,
+        kitchen: json["kitchen"] ?? 0,
+        livingRoom: json["livingRoom"] ?? 0,
+        electricity: json["electricity"] ?? false,
+        yard: json["yard"] ?? false,
+        water: json["water"] ?? false,
+        type: json["type"] ?? '',
+        contact: json["contact"] ?? '',
+        publishedDate:
+            (json['publishedDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
         monthlyPrice: json["monthlyPrice"]?.toDouble(),
-        sellerName: json["sellerName"],
-        province: json["province"],
+        sellerName: json["sellerName"] ?? '',
+        province: json["province"] ?? '',
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
-        isPromo: json["isPromo"],
-        image: json["image"],
+        isPromo: json["isPromo"] ?? false,
+        image: List<String>.from(json["image"] ?? []),
       );
 
   Map<String, dynamic> toJson() => {
@@ -124,13 +125,15 @@ class AdvertisementModel {
     water = data['water'];
     type = data['type'];
     contact = data['contact'];
-    publishedDate = data['publishedDate'];
+    publishedDate =
+        (data['publishedDate'] as Timestamp?)?.toDate() ?? DateTime.now();
     monthlyPrice = data['monthlyPrice']?.toDouble();
     sellerName = data['sellerName'];
     province = data['province'];
     latitude = data['latitude']?.toDouble();
     longitude = data['longitude']?.toDouble();
     isPromo = data['isPromo'];
-    image = data['image'];
+    image = List<String>.from(
+        data['image'] ?? []); // Correctly decode the list of strings
   }
 }
