@@ -98,7 +98,6 @@ class RegisterScreenState extends State<RegisterScreen> with ValidationMixins {
         ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          mainAxisSize: MainAxisSize.max,
           children: [
             const AppLogo(),
             Form(
@@ -137,60 +136,57 @@ class RegisterScreenState extends State<RegisterScreen> with ValidationMixins {
                       validator: (value) => insNotEmpty(value),
                     ),
                     const SizedBox(height: 5.0),
-                    Column(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: ElevatedButton(
-                            onPressed: _submit,
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.black),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                              ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: ElevatedButton(
+                        onPressed: _submit,
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
                             ),
-                            child: const Text(
-                              'Sign-up',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15.0,
-                              ),
-                            ),
-                            //color: Colors.pinkAccent,
                           ),
                         ),
-                        const Text(
-                          'Or tap below to sign-up with Google',
+                        child: const Text(
+                          'Sign-up',
                           style: TextStyle(
-                            fontSize: 13.0,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black38,
+                            fontSize: 15.0,
                           ),
                         ),
-                        const SizedBox(height: 5.0),
-                        GestureDetector(
-                          onTap: () => log('Google'),
-                          child: Image.asset(
-                            'assets/google_icon.png',
-                            height: 35.0,
-                            width: 35.0,
-                          ),
-                        ),
-                        const SizedBox(height: 10.0),
-                        const Text(
-                          'I already have an account.',
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            wordSpacing: 2,
-                          ),
-                        ),
-                      ],
+                        //color: Colors.pinkAccent,
+                      ),
+                    ),
+                    const Text(
+                      'Or tap below to sign-up with Google',
+                      style: TextStyle(
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black38,
+                      ),
+                    ),
+                    const SizedBox(height: 5.0),
+                    GestureDetector(
+                      onTap: () => log('Google'),
+                      child: Image.asset(
+                        'assets/google_icon.png',
+                        height: 35.0,
+                        width: 35.0,
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    const Text(
+                      'I already have an account.',
+                      style: TextStyle(
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        wordSpacing: 2,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ],
                 ),
