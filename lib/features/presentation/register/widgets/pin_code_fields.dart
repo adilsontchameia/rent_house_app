@@ -14,9 +14,7 @@ class PinCodeFields extends StatefulWidget {
 }
 
 class _PinCodeFieldsState extends State<PinCodeFields> {
-  var onTapRecognizer;
-
-  // ..text = "123456";
+  var onTapRecognizer = TapGestureRecognizer();
 
   StreamController<ErrorAnimationType>? errorController;
 

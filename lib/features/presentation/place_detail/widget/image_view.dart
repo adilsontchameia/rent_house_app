@@ -53,7 +53,6 @@ class PanoramaImageScreenState extends State<PanoramaImageScreen>
     return Scaffold(
       body: Stack(
         children: [
-          //TODO Move according to device movement.
           FadeTransition(
             opacity: _fadeInAnimation,
             child: Panorama(
