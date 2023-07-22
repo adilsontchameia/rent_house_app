@@ -36,8 +36,7 @@ class RegisterScreenState extends State<RegisterScreen> with ValidationMixins {
   Future<void> _showDialogBox() async {
     return showDialog<void>(
       context: context,
-
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.black,
@@ -53,27 +52,6 @@ class RegisterScreenState extends State<RegisterScreen> with ValidationMixins {
           content: const SingleChildScrollView(
             child: PinCodeFields(),
           ),
-          actions: <Widget>[
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -197,6 +175,8 @@ class _PinCodeFieldsState extends State<PinCodeFields> {
   String currentText = "";
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
+  bool isCompleted = false;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -217,68 +197,73 @@ class _PinCodeFieldsState extends State<PinCodeFields> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        child: PinCodeTextField(
-      appContext: context,
-      pastedTextStyle: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-      ),
-      length: 4,
-      //obscureText: false,
-      //obscuringCharacter: '*',
-      animationType: AnimationType.fade,
-      validator: (v) {
-        if (v!.length < 4) {
-          return 'Complete';
-        } else {
-          return null;
-        }
-      },
-      pinTheme: PinTheme(
-        shape: PinCodeFieldShape.box,
-        borderRadius: BorderRadius.circular(5),
-        fieldHeight: 50,
-        fieldWidth: 50,
-        activeColor: Colors.white,
-        disabledColor: Colors.amber,
-        inactiveColor: Colors.white,
-        selectedColor: Colors.white,
-        selectedFillColor: Colors.white,
-        inactiveFillColor: Colors.white54,
-        activeFillColor:
-            hasError ? Colors.black : Colors.white54.withOpacity(0.2),
-      ),
-      cursorColor: Colors.black,
-      animationDuration: const Duration(milliseconds: 300),
-      textStyle: const TextStyle(fontSize: 20, height: 1.6),
-      //backgroundColor: Colors.blue.shade50,
-      enableActiveFill: true,
-      errorAnimationController: errorController,
-      controller: textEditingController,
-      keyboardType: TextInputType.number,
-      boxShadows: const [
-        BoxShadow(
-          offset: Offset(0, 1),
-          color: Colors.black12,
-          blurRadius: 10,
-        )
-      ],
-      onCompleted: (v) {
-        log("Completed");
-      },
-      // onTap: () {
-      //   print("Pressed");
-      // },
-      onChanged: (value) {
-        log(value);
-        setState(() {
-          currentText = value;
-        });
-      },
-      beforeTextPaste: (text) {
-        log("Allowing to paste $text");
-        /*
+    return Column(
+      children: [
+        PinCodeTextField(
+          appContext: context,
+          pastedTextStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+          enabled: isLoading,
+          length: 4,
+          animationType: AnimationType.fade,
+          validator: (v) {
+            if (v!.length < 4) {
+              return 'Insira os 4 digitos';
+            } else {
+              return null;
+            }
+          },
+          pinTheme: PinTheme(
+            shape: PinCodeFieldShape.box,
+            borderRadius: BorderRadius.circular(5),
+            fieldHeight: 50,
+            fieldWidth: 50,
+            activeColor: Colors.black,
+            disabledColor: Colors.white,
+            inactiveColor: Colors.black,
+            selectedColor: Colors.white,
+            selectedFillColor: Colors.white,
+            inactiveFillColor: Colors.white30,
+            activeFillColor:
+                hasError ? Colors.white : Colors.white54.withOpacity(0.2),
+          ),
+          cursorColor: Colors.black,
+          animationDuration: const Duration(milliseconds: 300),
+          textStyle: TextStyle(
+            fontSize: 20,
+            height: 1.6,
+            color: isLoading ? Colors.white : Colors.black,
+          ),
+          //backgroundColor: Colors.blue.shade50,
+          enableActiveFill: true,
+          errorAnimationController: errorController,
+          controller: textEditingController,
+          keyboardType: TextInputType.number,
+          boxShadows: const [
+            BoxShadow(
+              offset: Offset(0, 1),
+              color: Colors.black12,
+              blurRadius: 10,
+            )
+          ],
+          onCompleted: (v) {
+            setState(() {
+              isCompleted = true;
+              isLoading = false;
+            });
+          },
+
+          onChanged: (value) {
+            log(value);
+            setState(() {
+              currentText = value;
+            });
+          },
+          beforeTextPaste: (text) {
+            log("Allowing to paste $text");
+            /*
           if (data?.text?.isNotEmpty ?? false) {
                           if (widget.beforeTextPaste != null) {
                             if (widget.beforeTextPaste!(data!.text)) {
@@ -289,10 +274,58 @@ class _PinCodeFieldsState extends State<PinCodeFields> {
                           }
                         }
                         */
-        //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-        //but you can show anything you want here, like your pop up saying wrong paste format or etc
-        return true;
-      },
-    ));
+            //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+            //but you can show anything you want here, like your pop up saying wrong paste format or etc
+            return true;
+          },
+        ),
+        Visibility(
+          visible: !isCompleted,
+          replacement: Container(
+            height: 50.0,
+            width: 50.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: CircularProgressIndicator(
+                color: Colors.black,
+                strokeWidth: 2.5,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.white,
+                  ),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                ),
+                onPressed: () {
+                  if (!isCompleted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    );
   }
 }
