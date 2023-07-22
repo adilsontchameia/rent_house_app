@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rent_house_app/features/presentation/image_view.dart';
+import 'package:rent_house_app/features/presentation/place_detail/widget/image_view.dart';
 import 'loading_widget.dart';
 
 class PanoramaScreen extends StatefulWidget {
