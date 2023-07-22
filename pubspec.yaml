@@ -12,6 +12,9 @@ environment:
 dependencies:
   cached_network_image: ^3.2.3
   cupertino_icons: ^1.0.2
+  firebase_auth: ^4.7.1
+  firebase_core: ^2.15.0
+  firebase_storage: ^11.2.5
   flutter:
     sdk: flutter
   panorama: ^0.4.1
