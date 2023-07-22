@@ -3,7 +3,9 @@ import 'package:rent_house_app/features/presentation/onboard/widgets/image_list_
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardScreen extends StatelessWidget {
-  OnboardScreen({super.key});
+  OnboardScreen({
+    super.key,
+  });
   final List<Widget> titlesList = [
     const OnboardTextTile(
       title: 'Procure pelo teu próximo cúbico com apenas um click.',
@@ -61,14 +63,19 @@ class OnboardScreen extends StatelessWidget {
                     'Mô Cubico',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   OnboardTitles(
-                      controller: _controller, titlesList: titlesList),
+                    controller: _controller,
+                    titlesList: titlesList,
+                  ),
                   SmoothDotsIndicator(
-                      controller: _controller, titlesList: titlesList)
+                    controller: _controller,
+                    titlesList: titlesList,
+                  )
                 ],
               ),
             ),
