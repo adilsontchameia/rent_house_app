@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:rent_house_app/features/presentation/onboard/widgets/get_started_button.dart';
 import 'package:rent_house_app/features/presentation/onboard/widgets/image_list_view.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:rent_house_app/features/presentation/onboard/widgets/onboard_content.dart';
+import 'package:rent_house_app/features/presentation/onboard/widgets/smooth_dots_indicator.dart';
 
 class OnboardScreen extends StatelessWidget {
   OnboardScreen({
     super.key,
   });
   final List<Widget> titlesList = [
-    const OnboardTextTile(
+    const OnboardTextContent(
       title: 'Procure pelo teu próximo cúbico com apenas um click.',
     ),
-    const OnboardTextTile(
+    const OnboardTextContent(
       title:
           'Registra-se com seu número de telefone, e troque mensagens com o vendedor, na maior calma.',
     ),
-    const OnboardTextTile(
+    const OnboardTextContent(
       title: 'Todos vendedores aqui, são confiáveis, e verificados.',
     ),
   ];
@@ -81,114 +83,9 @@ class OnboardScreen extends StatelessWidget {
             ),
           ),
           //Button
-          const GetStartedButton(index: 0)
+          const GetStartedButton()
         ],
       ),
     );
-  }
-}
-
-class OnboardTextTile extends StatelessWidget {
-  const OnboardTextTile({
-    super.key,
-    required this.title,
-  });
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-          fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-    );
-  }
-}
-
-class OnboardTitles extends StatelessWidget {
-  const OnboardTitles({
-    super.key,
-    required PageController controller,
-    required this.titlesList,
-  }) : _controller = controller;
-
-  final PageController _controller;
-  final List<Widget> titlesList;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 100.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0),
-          child: PageView(
-            controller: _controller,
-            children: titlesList,
-          ),
-        ));
-  }
-}
-
-class SmoothDotsIndicator extends StatelessWidget {
-  const SmoothDotsIndicator({
-    super.key,
-    required PageController controller,
-    required this.titlesList,
-  }) : _controller = controller;
-
-  final PageController _controller;
-  final List<Widget> titlesList;
-
-  @override
-  Widget build(BuildContext context) {
-    return SmoothPageIndicator(
-      controller: _controller,
-      count: titlesList.length,
-      effect: const JumpingDotEffect(
-        activeDotColor: Colors.white,
-        dotColor: Colors.grey,
-        dotHeight: 10.0,
-        dotWidth: 10.0,
-        jumpScale: 2.0,
-      ),
-    );
-  }
-}
-
-class GetStartedButton extends StatelessWidget {
-  const GetStartedButton({
-    super.key,
-    required this.index,
-  });
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-        bottom: 30.0,
-        left: 20.0,
-        right: 20.0,
-        child: SizedBox(
-          height: 50.0,
-          child: AbsorbPointer(
-            absorbing: index == index ? false : true,
-            child: ElevatedButton(
-              onPressed: () {
-                print('Navigated');
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0))),
-              child: const Text(
-                'Começar',
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-        ));
   }
 }
