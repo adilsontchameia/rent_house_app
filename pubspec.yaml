@@ -11,15 +11,25 @@ environment:
 
 dependencies:
   cached_network_image: ^3.2.3
+  cloud_firestore: ^4.8.3
   cupertino_icons: ^1.0.2
+  firebase_app_check: ^0.1.5+1
   firebase_auth: ^4.7.1
   firebase_core: ^2.15.0
   firebase_storage: ^11.2.5
   flutter:
     sdk: flutter
+  geocoder2: any
+  geoflutterfire2: ^2.3.15
+  geolocator: ^9.0.2
+  get: ^4.6.5
+  google_sign_in: ^6.1.4
+  image_picker: ^1.0.1
+  location_geocoder: ^1.0.5
   panorama: ^0.4.1
   permission_handler: ^10.4.3
   pin_code_fields: ^8.0.1
+  provider: ^6.0.5
   smooth_page_indicator: ^1.1.0
 
 dev_dependencies:
