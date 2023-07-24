@@ -1,0 +1,30 @@
+Backend
+
+Login and Sign-up
+
+Sign-up 
+Profile picture client and seller
+
+User
+
+Check Houses available
+Check price 
+If is in promotion tell it 
+Call seller 
+Check house location on map
+
+Seller
+Sell a house 
+Name
+Description
+
+Tipologia: T1
+Quartos: 2
+Água: Sim
+Energia: Sim
+Localização: xxxxxxxx
+Contactos: 65656565
+Preço (mensal): 15000
+Descrição adicional
+
+2 buttons « call and map 
