@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:rent_house_app/features/presentation/providers/user_provider.dart';
 import 'package:rent_house_app/features/presentation/widgets/app_logo.dart';
 import 'package:rent_house_app/features/presentation/widgets/custom_input_text.dart';
 import 'package:rent_house_app/helpers/validator_mixin.dart';
@@ -15,48 +16,22 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> with ValidationMixins {
   //? Global key for validation purpose
   final GlobalKey<FormState> _formKey = GlobalKey();
+
+  final UserAuthProvider _userAuthProvider = UserAuthProvider();
   //? Controllers
   final TextEditingController phoneNumberOrEmailController =
       TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> _submit() async {
-    _showDialogBox();
-    /*
     final validationPassed = _formKey.currentState!.validate();
     final String phoneOrEmail = phoneNumberOrEmailController.text.trim();
     final String password = passwordController.text.trim();
-    if (validationPassed) {
-      // _userManagerProvider.login(email, password);
-    }
-    */
-  }
 
-  Future<void> _showDialogBox() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.black,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-          title: const Text(
-            'Por favor, aguarde.',
-            style: TextStyle(
-              fontSize: 15.0,
-              color: Colors.white,
-            ),
-          ),
-          content: const Padding(
-            padding: EdgeInsets.all(10.0),
-            child: LinearProgressIndicator(
-              color: Colors.black,
-            ),
-          ),
-        );
-      },
-    );
+    //Validating before login
+    if (validationPassed) {
+      _userAuthProvider.login(phoneOrEmail, password);
+    }
   }
 
   @override
