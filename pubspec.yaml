@@ -7,9 +7,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.5 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
+  blurry: ^1.4.2
   cached_network_image: ^3.2.3
   cloud_firestore: ^4.8.3
   cupertino_icons: ^1.0.2
@@ -19,6 +20,7 @@ dependencies:
   firebase_storage: ^11.2.5
   flutter:
     sdk: flutter
+  font_awesome_flutter: ^10.5.0
   geocoder2: any
   geoflutterfire2: ^2.3.15
   geolocator: ^9.0.2
