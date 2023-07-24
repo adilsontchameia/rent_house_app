@@ -137,7 +137,7 @@ class UserAuthProvider extends ChangeNotifier {
       );
       if (isReady) {
         //GetImage URL to store to DB
-        final String imageUrl = await _userManager
+        await _userManager
             .uploadPicture(image!.path, DateTime.now().toString())
             .then((url) async {
           await _authService.register(
@@ -224,7 +224,6 @@ class UserAuthProvider extends ChangeNotifier {
             'Unknown Error: Unknown error, please contact the Support Team.');
       }
     }
-
     notifyListeners();
   }
 
