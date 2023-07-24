@@ -1,22 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rent_house_app/features/presentation/register/register_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:rent_house_app/app/my_app.dart';
+import 'package:rent_house_app/features/presentation/providers/user_provider.dart';
+import 'package:rent_house_app/firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //Prevent from landscape
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(useMaterial3: true),
-      home: const RegisterScreen(),
-    );
-  }
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserAuthProvider>(
+          create: (_) => UserAuthProvider(),
+          lazy: false,
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
