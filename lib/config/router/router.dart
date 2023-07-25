@@ -12,11 +12,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
                 advertisement: advertisement,
               ));
     case HomeResumeScreen.routeName:
-      return MaterialPageRoute(builder: (context) => HomeResumeScreen());
+      return MaterialPageRoute(builder: (context) => const HomeResumeScreen());
 
-    case ChatMessagesListScreen.routeName:
+    case ListChatMessagesScreen.routeName:
       return MaterialPageRoute(
-          builder: (context) => const ChatMessagesListScreen());
+          builder: (context) => const ListChatMessagesScreen());
     case ChatMessagesScreen.routeName:
       final arguments = settings.arguments as Map<String, dynamic>;
       final name = arguments['name'];
