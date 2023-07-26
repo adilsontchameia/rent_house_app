@@ -13,6 +13,7 @@ class SellerModel {
   bool? isVerified;
   bool? isTopSeller;
   bool? isOnline;
+  bool? isTyping;
   String? address;
   double? latitude;
   double? longitude;
@@ -26,6 +27,7 @@ class SellerModel {
     this.isVerified,
     this.isTopSeller,
     this.isOnline,
+    this.isTyping,
     this.address,
     this.latitude,
     this.longitude,
@@ -33,14 +35,15 @@ class SellerModel {
   });
 
   factory SellerModel.fromJson(Map<String, dynamic> json) => SellerModel(
-        id: json["id"],
-        firstName: json["firstName"],
-        surnName: json["surnName"],
-        phone: json["phone"],
-        isVerified: json["isVerified"],
-        isTopSeller: json["isTopSeller"],
-        isOnline: json["isOnline"],
-        address: json["address"],
+        id: json["id"] ?? '',
+        firstName: json["firstName"] ?? '',
+        surnName: json["surnName"] ?? '',
+        phone: json["phone"] ?? '',
+        isVerified: json["isVerified"] ?? true,
+        isTopSeller: json["isTopSeller"] ?? false,
+        isOnline: json["isOnline"] ?? true,
+        isTyping: json["isTyping"] ?? false,
+        address: json["address"] ?? '',
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
         image: json["image"],
@@ -54,6 +57,7 @@ class SellerModel {
         "isVerified": isVerified,
         "isTopSeller": isTopSeller,
         "isOnline": isOnline,
+        "isTyping": isTyping,
         "address": address,
         "latitude": latitude,
         "longitude": longitude,

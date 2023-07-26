@@ -15,6 +15,8 @@ class UserModel {
   String? password;
   double? latitude;
   double? longitude;
+  bool? isTyping;
+  bool? isOnline;
   String? image;
 
   UserModel({
@@ -28,6 +30,8 @@ class UserModel {
     this.password,
     this.latitude,
     this.longitude,
+    this.isTyping,
+    this.isOnline,
     this.image,
   });
 
@@ -41,6 +45,8 @@ class UserModel {
         address: json["address"],
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
+        isOnline: json["isOnline"] ?? true,
+        isTyping: json["isTyping"] ?? false,
         image: json["image"],
       );
 
@@ -54,6 +60,8 @@ class UserModel {
         "address": address,
         "latitude": latitude,
         "longitude": longitude,
+        "isOnline": isOnline,
+        "isTyping": isTyping,
         "image": image,
       };
 }
