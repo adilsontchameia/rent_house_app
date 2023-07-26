@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../app/app.dart';
 
 void showSnackBar(BuildContext context, String content) {
@@ -13,4 +15,9 @@ void showSnackBar(BuildContext context, String content) {
       ),
     ),
   );
+}
+
+String formatDateTime(DateTime date) {
+  String formattedDate = DateFormat('HH:mm / yyyy-MM-dd').format(date);
+  return formattedDate;
 }
