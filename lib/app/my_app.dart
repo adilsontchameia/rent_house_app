@@ -1,6 +1,8 @@
-import 'package:rent_house_app/features/presentation/check_auth/check_auth_screen.dart';
-
-import 'app.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../config/router/router.dart';
+import '../core/factories/dialog_factory.dart';
+import '../features/presentation/check_auth/check_auth_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
