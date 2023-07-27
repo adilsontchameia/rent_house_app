@@ -46,7 +46,7 @@ class GridViewWithData extends StatelessWidget {
           priceAddress ||
           category) {
         // Apply the filters
-        if (topPickedFilter != null && data['isTopPicked'] != topPickedFilter) {
+        if (topPickedFilter != null && data['isPromo'] != topPickedFilter) {
           return false;
         }
 
