@@ -19,15 +19,44 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
   String query = '';
   bool? topPickedFilter;
   String? categoryFilter;
+
+  String? provinceFilter;
   int? minPriceFilter;
   int? maxPriceFilter;
-  bool sortByTitleAZ = false;
   late bool isVisible;
   late bool isButtonSelected;
   final double minPrice = 5000.0;
   final double maxPrice = 500000.0;
   final double priceIncrement = 1000.0;
-  List<bool> buttonSelectedStates = [true, false, false, false, false, false];
+  List<bool> buttonSelectedStates = [true, false, false, false, false];
+  /*
+  List<String> provincesAvailable = [
+    'Bengo',
+    'Benguela',
+    'Bié',
+    'Cabinda',
+    'Cuando Cubango',
+    'Cuanza Norte',
+    'Cuanza Sul',
+    'Cunene',
+    'Huambo',
+    'Huíla',
+    'Luanda',
+    'Lunda Norte',
+    'Lunda Sul',
+    'Malanje',
+    'Moxico',
+    'Namibe',
+    'Uíge',
+    'Zaire',
+  ];
+  */
+  List<String> provincesAvailable = [
+    'Todas Provincias', // Add "Todas Provincias" as the first element
+    'Cuando Cubango',
+    'Huíla',
+    'Bié',
+  ];
 
   int get divisions {
     return ((maxPrice - minPrice) / priceIncrement).ceil();
@@ -42,6 +71,8 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Column(
       children: [
         SearchField(
@@ -65,8 +96,8 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
             collapsedIconColor: Colors.brown,
             iconColor: Colors.brown,
             leading: const Icon(FontAwesomeIcons.filter, color: Colors.brown),
-            title: const Text('Por Categorias',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
+            title: const Text('Por Categorias e Provincias',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0)),
             children: [
               Wrap(
                 spacing: 5.0,
@@ -79,7 +110,6 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                         categoryFilter = null;
                         minPriceFilter = null;
                         maxPriceFilter = null;
-                        sortByTitleAZ = false;
                         isButtonSelected = !isButtonSelected;
                       });
                     },
@@ -87,10 +117,11 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                     index: 0,
                   ),
                   _buildFilterButton(
-                    buttonText: sortByTitleAZ ? 'Ordenar ZA' : 'Ordenar AZ',
+                    buttonText: 'Promoções',
                     onPressed: () {
                       setState(() {
-                        sortByTitleAZ = !sortByTitleAZ;
+                        topPickedFilter = true;
+
                         isButtonSelected = !isButtonSelected;
                       });
                     },
@@ -98,26 +129,15 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                     index: 1,
                   ),
                   _buildFilterButton(
-                    buttonText: 'Promoções',
+                    buttonText: 'Apartamentos',
                     onPressed: () {
                       setState(() {
-                        topPickedFilter = true;
+                        categoryFilter = 'apartamento';
                         isButtonSelected = !isButtonSelected;
                       });
                     },
                     isSelected: buttonSelectedStates[2],
                     index: 2,
-                  ),
-                  _buildFilterButton(
-                    buttonText: 'Apartamentos',
-                    onPressed: () {
-                      setState(() {
-                        categoryFilter = 'apartamentos';
-                        isButtonSelected = !isButtonSelected;
-                      });
-                    },
-                    isSelected: buttonSelectedStates[3],
-                    index: 3,
                   ),
                   _buildFilterButton(
                     buttonText: 'Casas',
@@ -127,8 +147,8 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                         isButtonSelected = !isButtonSelected;
                       });
                     },
-                    isSelected: buttonSelectedStates[4],
-                    index: 4,
+                    isSelected: buttonSelectedStates[3],
+                    index: 3,
                   ),
                   _buildFilterButton(
                     buttonText: 'Quartos',
@@ -138,9 +158,31 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                         isButtonSelected = !isButtonSelected;
                       });
                     },
-                    isSelected: buttonSelectedStates[5],
-                    index: 5,
+                    isSelected: buttonSelectedStates[4],
+                    index: 4,
                   ),
+                  DropdownButton<String>(
+                    dropdownColor: Colors.brown,
+                    value: provinceFilter,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        if (newValue == 'Todas Provincias') {
+                          provinceFilter =
+                              null; // Clear the provinceFilter when "Todas Provincias" is selected
+                        } else {
+                          provinceFilter =
+                              newValue; // Update the provinceFilter for other provinces
+                        }
+                      });
+                    },
+                    items: provincesAvailable
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  )
                 ],
               ),
             ]),
@@ -151,7 +193,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
             leading: const Icon(FontAwesomeIcons.filterCircleDollar,
                 color: Colors.brown),
             title: const Text('Por Preço',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0)),
             children: [
               RangeSlider(
                 activeColor: Colors.brown,
@@ -191,14 +233,170 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 return const NoResultsFoundWidget();
               }
             } else {
-              return GridViewWithData(
-                snapshot: snapshot.data!,
-                query: query,
-                topPickedFilter: topPickedFilter,
-                categoryFilter: categoryFilter,
-                minPriceFilter: minPriceFilter,
-                maxPriceFilter: maxPriceFilter,
-                sortByTitleAZ: sortByTitleAZ,
+              List<DocumentSnapshot> filteredDocs =
+                  snapshot.data!.docs.where((doc) {
+                var data = doc.data() as Map<String, dynamic>;
+                bool titleMatches = data['title']
+                    .toString()
+                    .toLowerCase()
+                    .contains(query.toLowerCase());
+
+                bool priceAddress = data['address']
+                    .toString()
+                    .toLowerCase()
+                    .contains(query.toLowerCase());
+                bool category = data['type']
+                    .toString()
+                    .toLowerCase()
+                    .contains(query.toLowerCase());
+                bool province = data['province']
+                    .toString()
+                    .toLowerCase()
+                    .contains(query.toLowerCase());
+
+                if (query.isEmpty ||
+                    titleMatches ||
+                    priceAddress ||
+                    category ||
+                    province) {
+                  if (topPickedFilter != null &&
+                      data['isPromo'] != topPickedFilter) {
+                    return false;
+                  }
+
+                  if (categoryFilter != null &&
+                      !data['type']
+                          .toString()
+                          .toLowerCase()
+                          .contains(categoryFilter!)) {
+                    return false;
+                  }
+
+                  if (provinceFilter != null &&
+                      !data['province']
+                          .toString()
+                          .toLowerCase()
+                          .contains(provinceFilter!)) {
+                    return false;
+                  }
+
+                  if (minPriceFilter != null &&
+                      (data['monthlyPrice'] as int) < minPriceFilter!) {
+                    return false;
+                  }
+
+                  if (maxPriceFilter != null &&
+                      (data['monthlyPrice'] as int) > maxPriceFilter!) {
+                    return false;
+                  }
+
+                  return true;
+                }
+
+                return false;
+              }).toList();
+
+              if (filteredDocs.isEmpty) {
+                return const NoResultsFoundWidget();
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Anúncios Listados: ${filteredDocs.length}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      letterSpacing: 2,
+                      color: Colors.brown,
+                    ),
+                  ),
+                  SizedBox(
+                    height: height,
+                    width: width,
+                    child: AlignedGridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 10,
+                      itemCount: filteredDocs.length,
+                      itemBuilder: (context, index) {
+                        var data =
+                            filteredDocs[index].data() as Map<String, dynamic>;
+                        AdvertisementModel advertisement =
+                            AdvertisementModel.fromSnapshot(
+                                filteredDocs[index]);
+                        return GestureDetector(
+                          onTap: () => Navigator.of(context).pushNamed(
+                            SaleDetailsScreen.routeName,
+                            arguments: advertisement,
+                          ),
+                          child: SizedBox(
+                            height: height * 0.30,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: data['image'].first,
+                                    fit: BoxFit.fill,
+                                    height: height,
+                                    width: width,
+                                    placeholder: (context, str) => Center(
+                                      child: Image.asset('assets/loading.gif'),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: height,
+                                    width: width,
+                                    color: Colors.black.withOpacity(0.3),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                      vertical: 10.0,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          data['title'],
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
+                                        TopPickedCardContent(
+                                          content: data['province'],
+                                          icon: FontAwesomeIcons.locationPin,
+                                        ),
+                                        TopPickedCardContent(
+                                          content: data['address'],
+                                          icon: FontAwesomeIcons.mapLocation,
+                                        ),
+                                        TopPickedCardContent(
+                                          content: KwanzaFormatter.formatKwanza(
+                                              double.parse(
+                                            data['monthlyPrice'].toString(),
+                                          )),
+                                          icon: FontAwesomeIcons.moneyBill,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             }
           },
