@@ -23,9 +23,11 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
   int? maxPriceFilter;
   bool sortByTitleAZ = false;
   late bool isVisible;
+  late bool isButtonSelected;
   final double minPrice = 5000.0;
   final double maxPrice = 500000.0;
   final double priceIncrement = 1000.0;
+  List<bool> buttonSelectedStates = [true, false, false, false, false, false];
 
   int get divisions {
     return ((maxPrice - minPrice) / priceIncrement).ceil();
@@ -34,6 +36,7 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
   @override
   void initState() {
     isVisible = false;
+    isButtonSelected = false;
     super.initState();
   }
 
@@ -68,7 +71,8 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
               Wrap(
                 spacing: 5.0,
                 children: [
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: 'Todos',
                     onPressed: () {
                       setState(() {
                         topPickedFilter = null;
@@ -76,93 +80,66 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                         minPriceFilter = null;
                         maxPriceFilter = null;
                         sortByTitleAZ = false;
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: const Text('Todos'),
+                    isSelected: buttonSelectedStates[0],
+                    index: 0,
                   ),
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: sortByTitleAZ ? 'Ordenar ZA' : 'Ordenar AZ',
                     onPressed: () {
                       setState(() {
                         sortByTitleAZ = !sortByTitleAZ;
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: Text(sortByTitleAZ ? 'Ordenar ZA' : 'Ordenar AZ'),
+                    isSelected: buttonSelectedStates[1],
+                    index: 1,
                   ),
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: 'Promoções',
                     onPressed: () {
                       setState(() {
                         topPickedFilter = true;
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: const Text('Promoções'),
+                    isSelected: buttonSelectedStates[2],
+                    index: 2,
                   ),
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: 'Apartamentos',
                     onPressed: () {
                       setState(() {
                         categoryFilter = 'apartamentos';
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: const Text('Apartamentos'),
+                    isSelected: buttonSelectedStates[3],
+                    index: 3,
                   ),
-
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: 'Casas',
                     onPressed: () {
                       setState(() {
                         categoryFilter = 'casa';
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: const Text('Casas'),
+                    isSelected: buttonSelectedStates[4],
+                    index: 4,
                   ),
-                  //TODO change
-                  ElevatedButton(
+                  _buildFilterButton(
+                    buttonText: 'Quartos',
                     onPressed: () {
                       setState(() {
                         categoryFilter = 'quartos';
+                        isButtonSelected = !isButtonSelected;
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.all(5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.0))),
-                    child: const Text('Quartos'),
+                    isSelected: buttonSelectedStates[5],
+                    index: 5,
                   ),
                 ],
               ),
@@ -214,9 +191,6 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 return const NoResultsFoundWidget();
               }
             } else {
-              //TODO implement
-              //AdvertisementModel advertisement = snapshot.data![index];
-
               return GridViewWithData(
                 snapshot: snapshot.data!,
                 query: query,
@@ -230,6 +204,34 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildFilterButton({
+    required String buttonText,
+    required VoidCallback onPressed,
+    required bool isSelected,
+    required int index,
+  }) {
+    return ElevatedButton(
+      onPressed: () {
+        onPressed();
+        setState(() {
+          for (int i = 0; i < buttonSelectedStates.length; i++) {
+            buttonSelectedStates[i] = i == index;
+          }
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? Colors.brown : Colors.brown.shade300,
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+        elevation: 2,
+        padding: const EdgeInsets.all(5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2.0),
+        ),
+      ),
+      child: Text(buttonText),
     );
   }
 }
