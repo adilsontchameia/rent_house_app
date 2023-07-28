@@ -7,18 +7,18 @@ class GridViewWithData extends StatelessWidget {
     required this.query,
     this.topPickedFilter,
     this.categoryFilter,
+    this.provinceFilter,
     this.minPriceFilter,
     this.maxPriceFilter,
-    this.sortByTitleAZ,
   }) : super(key: key);
 
   final QuerySnapshot snapshot;
   final String query;
   final bool? topPickedFilter;
   final String? categoryFilter;
+  final String? provinceFilter;
   final int? minPriceFilter;
   final int? maxPriceFilter;
-  final bool? sortByTitleAZ;
 
   @override
   Widget build(BuildContext context) {
@@ -29,29 +29,37 @@ class GridViewWithData extends StatelessWidget {
       var data = doc.data() as Map<String, dynamic>;
       bool titleMatches =
           data['title'].toString().toLowerCase().contains(query.toLowerCase());
-      bool provinceMatches = data['province']
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase());
+
       bool priceAddress = data['address']
           .toString()
           .toLowerCase()
           .contains(query.toLowerCase());
       bool category =
           data['type'].toString().toLowerCase().contains(query.toLowerCase());
+      bool province = data['province']
+          .toString()
+          .toLowerCase()
+          .contains(query.toLowerCase());
 
       if (query.isEmpty ||
           titleMatches ||
-          provinceMatches ||
           priceAddress ||
-          category) {
-        // Apply the filters
+          category ||
+          province) {
         if (topPickedFilter != null && data['isPromo'] != topPickedFilter) {
           return false;
         }
 
         if (categoryFilter != null &&
             !data['type'].toString().toLowerCase().contains(categoryFilter!)) {
+          return false;
+        }
+
+        if (provinceFilter != null &&
+            !data['province']
+                .toString()
+                .toLowerCase()
+                .contains(provinceFilter!)) {
           return false;
         }
 
@@ -70,11 +78,6 @@ class GridViewWithData extends StatelessWidget {
 
       return false;
     }).toList();
-
-    if (sortByTitleAZ == true) {
-      filteredDocs.sort((a, b) => (a.data() as Map<String, dynamic>)['title']
-          .compareTo((b.data() as Map<String, dynamic>)['title']));
-    }
 
     if (filteredDocs.isEmpty) {
       return const NoResultsFoundWidget();
@@ -109,13 +112,16 @@ class GridViewWithData extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.0),
                   child: Stack(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: data['image'].first,
-                        fit: BoxFit.fill,
-                        height: height,
-                        width: width,
-                        placeholder: (context, str) => Center(
-                          child: Image.asset('assets/loading.gif'),
+                      Hero(
+                        tag: 'header_pic',
+                        child: CachedNetworkImage(
+                          imageUrl: data['image'].first,
+                          fit: BoxFit.fill,
+                          height: height,
+                          width: width,
+                          placeholder: (context, str) => Center(
+                            child: Image.asset('assets/loading.gif'),
+                          ),
                         ),
                       ),
                       Container(
@@ -131,14 +137,16 @@ class GridViewWithData extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              data['title'],
-                              softWrap: true,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
+                            BounceInUp(
+                              child: Text(
+                                data['title'],
+                                softWrap: true,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
                               ),
                             ),
                             TopPickedCardContent(
