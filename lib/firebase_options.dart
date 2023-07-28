@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '867211967543',
     projectId: 'homerent-a6208',
     storageBucket: 'homerent-a6208.appspot.com',
+    androidClientId: '867211967543-vd09sq3tuibka7602q4isqo12bpni9ej.apps.googleusercontent.com',
     iosClientId: '867211967543-pq8joven9t6d3s9kr0ig0enath9rsqas.apps.googleusercontent.com',
     iosBundleId: 'com.example.rentHouseApp',
   );
