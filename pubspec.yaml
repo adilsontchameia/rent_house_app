@@ -26,6 +26,7 @@ dependencies:
   flutter_staggered_grid_view: ^0.6.2
   font_awesome_flutter: ^10.5.0
   geocoder2: any
+  geocoding: ^2.1.0
   geoflutterfire2: ^2.3.15
   geolocator: ^9.0.2
   get: ^4.6.5

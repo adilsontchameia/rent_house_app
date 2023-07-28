@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "867211967543-mui2ickbn04hckbvqad524jnaljd2ukl.apps.googleusercontent.com",
+          "client_id": "867211967543-vd09sq3tuibka7602q4isqo12bpni9ej.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rent_house_app",
+            "certificate_hash": "1076d5ea778eaca727c1ba3ab23e1156134b71c2"
+          }
+        },
+        {
+          "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "867211967543-mui2ickbn04hckbvqad524jnaljd2ukl.apps.googleusercontent.com",
+              "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
               "client_type": 3
             },
             {
