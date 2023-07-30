@@ -1,17 +1,18 @@
-import 'dart:developer';
-import 'dart:io';
+import '../../app/app.dart';
+import 'services.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-
-import '../data/models/user_model.dart';
-
-class UserManager {
+class UserManager extends ChangeNotifier {
   //? Firebase
   final CollectionReference _ref =
       FirebaseFirestore.instance.collection('users');
+  final CollectionReference _sellerRef =
+      FirebaseFirestore.instance.collection('seller');
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  late final FirebaseAuth _firebaseAuth;
+
+  UserManager() {
+    _firebaseAuth = FirebaseAuth.instance;
+  }
 
   //? Create User - Create User Info On Firebase Firestore
   Future<void> create(UserModel user) async {
@@ -20,19 +21,42 @@ class UserManager {
     } on FirebaseException catch (e) {
       log('Create Error: ${e.toString()}');
     }
+    notifyListeners();
   }
 
-  //? Get User By ID
-  Future<UserModel> getById(String id) async {
-    DocumentSnapshot document = await _ref.doc(id).get();
+  //? Get Current User
+  User getUser() {
+    notifyListeners();
+    return _firebaseAuth.currentUser!;
+  }
 
-    if (document.exists) {
-      UserModel user =
-          UserModel.fromJson(document.data() as Map<String, dynamic>);
-      return user;
-    }
+  //? Get Seller By ID
+  Stream<UserModel> getUserById(String id) {
+    notifyListeners();
+    return _ref.doc(id).snapshots().map((documentSnapshot) {
+      if (documentSnapshot.exists) {
+        return UserModel.fromJson(
+          documentSnapshot.data() as Map<String, dynamic>,
+        );
+      } else {
+        // Return null if the document doesn't exist
+        return UserModel();
+      }
+    });
+  }
 
-    return UserModel();
+  Stream<UserModel> getSellerById(String id) {
+    notifyListeners();
+    return _sellerRef.doc(id).snapshots().map((documentSnapshot) {
+      if (documentSnapshot.exists) {
+        return UserModel.fromJson(
+          documentSnapshot.data() as Map<String, dynamic>,
+        );
+      } else {
+        // Return null if the document doesn't exist
+        return UserModel();
+      }
+    });
   }
 
   //? Update user device token
