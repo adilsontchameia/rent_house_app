@@ -45,16 +45,16 @@ class UserManager extends ChangeNotifier {
     });
   }
 
-  Stream<UserModel> getSellerById(String id) {
+  Stream<SellerModel> getSellerById(String id) {
     notifyListeners();
     return _sellerRef.doc(id).snapshots().map((documentSnapshot) {
       if (documentSnapshot.exists) {
-        return UserModel.fromJson(
+        return SellerModel.fromJson(
           documentSnapshot.data() as Map<String, dynamic>,
         );
       } else {
         // Return null if the document doesn't exist
-        return UserModel();
+        return SellerModel();
       }
     });
   }
