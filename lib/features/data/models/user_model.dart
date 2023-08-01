@@ -1,55 +1,57 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
 
 String userModelToJson(UserModel data) => json.encode(data.toJson());
 
 class UserModel {
   String? id;
-  String? name;
-  String? email;
+  String? firstName;
+  String? surnName;
   String? phone;
+  String? email;
   String? address;
+  String? password;
   double? latitude;
   double? longitude;
   String? image;
-  GeoPoint? location;
 
   UserModel({
     this.id,
-    this.name,
-    this.email,
+    this.firstName,
+    this.surnName,
     this.phone,
+    this.email,
     this.address,
+    this.password,
     this.latitude,
     this.longitude,
     this.image,
-    this.location,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json["id"],
-        name: json["name"],
-        email: json["email"],
+        firstName: json["firstName"],
+        surnName: json["surnName"],
         phone: json["phone"],
+        email: json["email"],
         address: json["address"],
+        password: json["password"],
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
         image: json["image"],
-        location: json["location"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "name": name,
-        "email": email,
+        "firstName": firstName,
+        "surnName": surnName,
         "phone": phone,
+        "email": email,
         "address": address,
+        "password": password,
         "latitude": latitude,
         "longitude": longitude,
         "image": image,
-        "location": location,
       };
 }
