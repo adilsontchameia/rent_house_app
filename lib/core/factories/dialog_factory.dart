@@ -10,7 +10,7 @@ class DialogFactory {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.brown,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
           title: const Text(
