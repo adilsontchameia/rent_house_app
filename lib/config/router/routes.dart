@@ -1,7 +1,7 @@
 export 'package:flutter/material.dart';
 export 'package:rent_house_app/features/presentation/route_error/route_error.dart';
 export 'package:rent_house_app/features/presentation/filtered_advertisiment/filtered_advertisiment_screen.dart';
-export 'package:rent_house_app/features/presentation/chat_messages/chat_message_screen.dart';
+export 'package:rent_house_app/features/presentation/chat_messages_list/chat_messages_list_screen.dart';
 export 'package:rent_house_app/features/presentation/home_screen/home_screen.dart';
 export 'package:rent_house_app/features/presentation/bottom_navigation_pages/bottom_navigation_screen.dart';
 export 'package:rent_house_app/features/presentation/login/login_screen.dart';

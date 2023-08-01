@@ -1,3 +1,6 @@
+import 'package:rent_house_app/features/presentation/chat_messages/chat_messages_screen.dart';
+import 'package:rent_house_app/features/presentation/check_auth/check_auth_screen.dart';
+
 import 'routes.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -11,8 +14,21 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case HomeResumeScreen.routeName:
       return MaterialPageRoute(builder: (context) => HomeResumeScreen());
 
-    case ChatMessageScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const ChatMessageScreen());
+    case ChatMessagesListScreen.routeName:
+      return MaterialPageRoute(
+          builder: (context) => const ChatMessagesListScreen());
+    case ChatMessagesScreen.routeName:
+      final arguments = settings.arguments as Map<String, dynamic>;
+      final name = arguments['name'];
+      final uid = arguments['uid'];
+      return MaterialPageRoute(
+        builder: (context) => ChatMessagesScreen(
+          name: name,
+          uid: uid,
+        ),
+      );
+    case CheckAuthScreen.routeName:
+      return MaterialPageRoute(builder: (context) => const CheckAuthScreen());
     case LoginScreen.routeName:
       return MaterialPageRoute(builder: (context) => const LoginScreen());
     case RegisterScreen.routeName:
@@ -23,10 +39,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
           builder: (context) => const FilteredAdvertisimentScreen());
     case ImmersiveViewerScreen.routeName:
-      final imageIndex = settings.arguments as Map<String, dynamic>;
+      final arguments = settings.arguments as Map<String, dynamic>;
+      final imageIndex = arguments['imageIndex'];
       return MaterialPageRoute(
-        builder: (context) =>
-            ImmersiveViewerScreen(imageIndex: imageIndex['imageIndex']),
+        builder: (context) => ImmersiveViewerScreen(imageIndex: imageIndex),
       );
 
     default:
