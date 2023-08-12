@@ -44,7 +44,8 @@ class _SaleDetailsScreenState extends State<SaleDetailsScreen> {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(seconds: 1),
-                  height: highView ? height : height * 0.50,
+                  height: highView ? height : height * 0.60,
+                  width: width,
                   color: Colors.white,
                   child: Card(
                     elevation: 3.0,
