@@ -8,6 +8,7 @@ class UserModel {
   String? id;
   String? firstName;
   String? surnName;
+  String? fullName;
   String? phone;
   String? email;
   String? address;
@@ -20,6 +21,7 @@ class UserModel {
     this.id,
     this.firstName,
     this.surnName,
+    this.fullName,
     this.phone,
     this.email,
     this.address,
@@ -33,10 +35,10 @@ class UserModel {
         id: json["id"],
         firstName: json["firstName"],
         surnName: json["surnName"],
+        fullName: json['fullName'],
         phone: json["phone"],
         email: json["email"],
         address: json["address"],
-        password: json["password"],
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
         image: json["image"],
@@ -46,10 +48,10 @@ class UserModel {
         "id": id,
         "firstName": firstName,
         "surnName": surnName,
+        "fullName": fullName,
         "phone": phone,
         "email": email,
         "address": address,
-        "password": password,
         "latitude": latitude,
         "longitude": longitude,
         "image": image,
