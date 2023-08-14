@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:rent_house_app/features/data/models/user_model.dart';
 import 'package:rent_house_app/features/services/chat_service.dart';
+import 'package:rent_house_app/features/services/user_manager.dart';
 
 class BottomChatField extends StatefulWidget {
   final String receiverId;
@@ -17,39 +17,38 @@ class BottomChatField extends StatefulWidget {
 class _BottomChatFieldState extends State<BottomChatField> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
+  final UserManager _userManager = UserManager();
   bool isWritting = false;
 
   sendTextMessage() async {
-    UserModel currentUser = UserModel(
-      id: 'b6ROZ90YVOhuCU5kxOZVy0QxQ6t1',
-      firstName: 'Yago',
-      surnName: 'Mutango',
-      phone: '12345678',
-      email: 'yago@user.com',
-      address: 'Estrada Nacional 280, EN280',
-      latitude: -14.66254,
-      longitude: 17.712765,
-      image:
-          'https://firebasestorage.googleapis.com/v0/b/homerent-a6208.appspot.com/o/profilePics%2F2023-07-29%2001%3A17%3A40.618135?alt=media&token=89048828-9e0c-4655-8b68-9674448b315d',
-    );
-    if (isWritting) {
-      return _chatService.sendTextMessage(
-        text: _messageController.text.trim(),
-        receiverId: 'KYG7pdk3ESjmqusYsKYI',
-        senderUser: currentUser,
-      );
-    }
+    setState(() {
+      if (isWritting) {
+        final message = _messageController.text.trim();
+        _chatService.sendTextMessage(
+          message: message,
+          sellerId: widget.receiverId,
+        );
+      }
+      _messageController.text = '';
+      _userManager.isNotWriting();
+    });
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _userManager.isNotWriting();
     super.dispose();
   }
 
   void _onTextChanged(String value) {
     setState(() {
       isWritting = value.trim().isNotEmpty;
+      if (isWritting) {
+        _userManager.isWriting();
+      } else {
+        _userManager.isNotWriting();
+      }
     });
   }
 
