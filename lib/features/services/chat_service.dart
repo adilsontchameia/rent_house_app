@@ -1,145 +1,161 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:rent_house_app/app/app.dart';
-import 'package:rent_house_app/core/factories/dialogs.dart';
-import 'package:rent_house_app/features/data/models/chat_contact.dart';
-import 'package:rent_house_app/features/data/models/message_model.dart';
-import 'package:rent_house_app/features/services/services.dart';
-import 'package:uuid/uuid.dart';
+
+import '../../core/factories/dialogs.dart';
 
 class ChatService extends ChangeNotifier {
   late FirebaseFirestore firestore;
   late FirebaseAuth auth;
   final ShowAndHideDialogs _dialogs = ShowAndHideDialogs();
-  static const usersCollection = 'users';
-  static const chatsCollection = 'users';
-  static const messagesCollection = 'users';
 
   ChatService() {
     firestore = FirebaseFirestore.instance;
     auth = FirebaseAuth.instance;
   }
 
-  void _saveDataToContactSubCollection(
-    UserModel senderUserData,
-    UserModel receiverUserData,
-    String text,
-    DateTime timeSent,
-    String receiverUserId,
-  ) async {
-    //? users -> receiverId -> chats -> store data
-    var receiverChatContact = ChatContacts(
-      name: '${senderUserData.firstName} ${senderUserData.surnName}',
-      profilePic: senderUserData.image!,
-      contactId: senderUserData.id!,
-      timeSent: timeSent,
-      lastMessage: text,
-    );
-    await firestore
-        .collection(usersCollection)
-        .doc(receiverUserId)
-        .collection(chatsCollection)
-        .doc(auth.currentUser!.uid)
-        .set(
-          receiverChatContact.toMap(),
-        );
-    //? users -> currentId -> chats -> store data
-    var senderChatContact = ChatContacts(
-      name: '${receiverUserData.firstName} ${receiverUserData.surnName}',
-      profilePic: receiverUserData.image!,
-      contactId: receiverUserData.id!,
-      timeSent: timeSent,
-      lastMessage: text,
-    );
-    await firestore
-        .collection(usersCollection)
-        .doc(auth.currentUser!.uid)
-        .collection(chatsCollection)
-        .doc(receiverUserId)
-        .set(
-          senderChatContact.toMap(),
-        );
-    notifyListeners();
-  }
-
-  void _saveMessageToMessageSubcollection({
-    required String receiverUserId,
-    required String text,
-    required DateTime timeSent,
-    required String messageId,
-    required String userName,
-    required String receiverUsername,
+  void sendTextMessage({
+    required String message,
+    required String sellerId,
   }) async {
-    final message = MessageModel(
-      senderId: auth.currentUser!.uid,
-      receiverId: receiverUserId,
-      text: text,
-      timeSent: timeSent,
-      messageId: messageId,
-      isSeen: false,
-    );
-    //? users ->  senderId -> receiverId -> messages -> store message
-    await firestore
-        .collection(usersCollection)
-        .doc(receiverUserId)
-        .collection(chatsCollection)
-        .doc(auth.currentUser!.uid)
-        .collection(messagesCollection)
-        .doc(messageId)
-        .set(
-          message.toMap(),
-        );
-    //? users ->  senderId -> receiverId -> messages -> store message
-    await firestore
-        .collection(usersCollection)
-        .doc(auth.currentUser!.uid)
-        .collection(chatsCollection)
-        .doc(receiverUserId)
-        .collection(messagesCollection)
-        .doc(messageId)
-        .set(
-          message.toMap(),
-        );
-    notifyListeners();
-  }
-
-  sendTextMessage({
-    required String text,
-    required String receiverId,
-    required UserModel senderUser,
-  }) async {
-    //Chat schema
-    //? user (senderId) -> receiverId -> messageId(collection) -> store message
     try {
-      var timeSent = DateTime.now();
-      UserModel receiverUserData;
-      var userDataMap =
-          await firestore.collection(usersCollection).doc(receiverId).get();
+      final timeSent = DateTime.now();
+      final currentId = auth.currentUser!.uid;
 
-      receiverUserData = UserModel.fromJson(userDataMap.data()!);
+      final senderMessageRef = await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(sellerId)
+          .collection('chats')
+          .add({
+        'senderId': currentId,
+        'receiverId': sellerId,
+        'message': message,
+        'date': timeSent,
+        'isSeen': false,
+      });
+      // Get the ID of the newly created message document
+      final senderMessageId = senderMessageRef.id;
 
-      //? Generate unique userID
-      var messageId = const Uuid().v1();
-      //Saving the data to 2 collections
-      _saveDataToContactSubCollection(
-        senderUser,
-        receiverUserData,
-        text,
-        timeSent,
-        receiverId,
-      );
+      // Update the message document with the messageId
+      await senderMessageRef.update({
+        'messageId': senderMessageId,
+      });
 
-      _saveMessageToMessageSubcollection(
-        receiverUserId: receiverId,
-        text: text,
-        timeSent: timeSent,
-        messageId: messageId,
-        receiverUsername:
-            '${receiverUserData.firstName} ${receiverUserData.surnName}',
-        userName: '${senderUser.firstName} ${senderUser.surnName}',
-      );
+      // Update last message for the seller
+      await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(sellerId)
+          .set({
+        'lastMessage': message,
+        'lastMessageDate': timeSent,
+      });
+
+      //_ User who we are talking to
+      final receiverMessageRef = await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(currentId)
+          .collection('chats')
+          .add({
+        'senderId': currentId,
+        'receiverId': sellerId,
+        'message': message,
+        'date': timeSent,
+        'isSeen': false,
+      });
+      // Get the ID of the newly created message document
+      final receiverMessageId = receiverMessageRef.id;
+
+      // Update the message document with the messageId
+      await receiverMessageRef.update({
+        'messageId': receiverMessageId,
+      });
+      // Update last message for the current user
+      await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(currentId)
+          .set({
+        'lastMessage': message,
+        'lastMessageDate': timeSent,
+      });
     } catch (e) {
       _dialogs.showToastMessage(e.toString());
     }
-    notifyListeners();
+  }
+
+  Future<void> setChatMessageSeen(String userId, String messageId) async {
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final chatDocRef = FirebaseFirestore.instance
+            .collection('messages')
+            .doc(userId)
+            .collection('chats')
+            .doc(messageId);
+
+        final chatSnapshot = await transaction.get(chatDocRef);
+
+        if (chatSnapshot.exists) {
+          if (!chatSnapshot.data()!['isSeen']) {
+            transaction.update(chatDocRef, {'isSeen': true});
+          }
+        }
+      });
+    } catch (e) {
+      log('Error updating isSeen: $e');
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllChatsMessage(
+      String sellerId) {
+    return FirebaseFirestore.instance
+        .collection('messages')
+        .doc(sellerId)
+        .collection('chats')
+        .orderBy(
+          'date',
+          descending: false,
+        )
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> listAllChatsMessage() {
+    return FirebaseFirestore.instance.collection('messages').snapshots();
+  }
+
+  Future<Map<String, dynamic>> getLastMessage(String chatId) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(chatId)
+          .get();
+
+      if (querySnapshot.exists) {
+        final lastMessage = querySnapshot.data()!;
+        final timestamp = lastMessage['lastMessageDate'] as Timestamp;
+
+        final dateTime =
+            DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
+
+        final formattedTime = DateFormat('HH:mm').format(dateTime);
+
+        return {
+          'lastMessage': lastMessage['lastMessage'],
+          'lastMessageDate': formattedTime,
+        };
+      } else {
+        return {
+          'lastMessage': '',
+          'lastMessageDate': null,
+        };
+      }
+    } catch (e) {
+      print('Error fetching last message: $e');
+      return {
+        'lastMessage': '',
+        'lastMessageDate': null,
+      };
+    }
   }
 }
