@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rent_house_app/features/presentation/chat_messages/widgets/bottom_chat_field.dart';
 import 'package:rent_house_app/features/presentation/chat_messages/widgets/chat_list.dart';
 import 'package:rent_house_app/features/services/user_manager.dart';
 
+import '../../services/auth_service.dart';
 import '../home_screen/home.dart';
 
 class ChatMessagesScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class ChatMessagesScreen extends StatefulWidget {
 
 class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
   final UserManager _userManager = UserManager();
+  final AuthService _authService = AuthService();
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -29,11 +32,11 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.brown),
-        title: StreamBuilder(
+        title: StreamBuilder<SellerModel>(
             stream: _userManager.getSellerById(widget.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Container();
               }
               return Row(
                 children: [
@@ -67,14 +70,32 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
                           fontSize: 18.0,
                         ),
                       ),
-                      Text(
-                        snapshot.data!.isOnline! ? 'online' : 'offline',
-                        style: const TextStyle(
-                          color: Colors.black38,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13.0,
-                        ),
-                      ),
+                      StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('sellers')
+                            .doc(widget.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final isTyping =
+                                snapshot.data?.get('isTyping') ?? false;
+                            final status = snapshot.data?.get('isOnline')
+                                ? 'Online'
+                                : 'Offline';
+
+                            return Text(
+                              isTyping ? 'Typing...' : status,
+                              style: TextStyle(
+                                color: isTyping ? Colors.green : Colors.black38,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.0,
+                              ),
+                            );
+                          }
+
+                          return const SizedBox(); // Handle loading/error state
+                        },
+                      )
                     ],
                   )
                 ],
@@ -84,8 +105,8 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
       ),
       body: Column(
         children: [
-          const Expanded(
-            child: ChatList(),
+          Expanded(
+            child: ChatList(sellerId: widget.uid),
           ),
           BottomChatField(receiverId: widget.uid),
         ],
