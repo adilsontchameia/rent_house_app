@@ -85,8 +85,7 @@ class _ChatListState extends State<ChatList> {
                     );
                   }
 
-                  final formattedDate =
-                      DateFormat('hh:mm a').format(message.date);
+                  String formattedDate = DateFormat.jm().format(message.date);
                   if (isMe) {
                     return MyMessageCard(
                       message: message.message,
