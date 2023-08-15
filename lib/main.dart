@@ -5,9 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:rent_house_app/app/my_app.dart';
 import 'package:rent_house_app/features/presentation/providers/user_data_provider.dart';
 import 'package:rent_house_app/features/presentation/providers/user_provider.dart';
-import 'package:rent_house_app/features/services/chat_service.dart';
 import 'package:rent_house_app/features/services/user_manager.dart';
 import 'package:rent_house_app/firebase_options.dart';
+
+import 'features/services/chat_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
